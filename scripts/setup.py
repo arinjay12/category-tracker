@@ -297,7 +297,7 @@ hard_excludes:
   preset:
 {chr(10).join(f"    - {e}" for e in hard_excludes) if hard_excludes else "    []"}
   custom:
-{chr(10).join(f"    - \"{e}\"" for e in hard_excludes_custom) if hard_excludes_custom else "    []"}
+{chr(10).join('    - "' + e + '"' for e in hard_excludes_custom) if hard_excludes_custom else "    []"}
 """
 
 
