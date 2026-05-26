@@ -85,7 +85,12 @@ Reactions that don't map to a profile change (*"I like #2"*, *"the wellness angl
 
 A typical run produces 5 ideas, ranked by composite score. Each idea has Problem, Target consumer, Why now, Hero product, Unit economics, Sourcing notes, GTM playbook, named Indian competitors, and global reference brands. Ideas that fail hard thresholds (launchability, capital fit, competition) get flagged with reasons but still appear.
 
-Below is one idea from a real run. Profile used: 3 picked categories (accessories, jewellery & watches, eyewear), capital ceiling ₹30 lakh, distribution channels: paid digital ads, organic social, influencer, PR/press, quick commerce, referral/virality.
+Below is one idea from a real run, rendered in the Claude Code Mac app. Profile used: 3 picked categories (accessories, jewellery & watches, eyewear), capital ceiling ₹30 lakh, distribution channels: paid digital ads, organic social, influencer, PR/press, quick commerce, referral/virality.
+
+![Example output rendered in the Claude Code Mac app](docs/images/example-output.png)
+
+<details>
+<summary>See the raw markdown the skill produces</summary>
 
 ```
 ## 1. Kavach Premium MacBook Sleeve  ·  [9.0/10]  ·  ✓ Passed  ·  🌍 Geo-arbitrage
@@ -169,6 +174,8 @@ Designs (US, vegetable-tanned leather cases, design-forward), Hard Graft
 - Distribution fit:    ■■■■■■■■□□ 8/10
 - Geo-arbitrage:       ■■■■■■■■□□ 8/10
 ```
+
+</details>
 
 The "Competition headroom: 2/10" surfaces honestly that this category is competitive. The system doesn't hide that just because the overall score is high. Flagged ideas (when they appear) get a one-line "Why flagged" explanation and sort below passing ones, so you can see what was rejected and why.
 
