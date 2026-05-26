@@ -179,6 +179,11 @@ def render_ideas(ideas: list, run_started: float | None = None, profile: dict | 
         diagnostic = _build_diagnostic(rejected, passed, profile)
         out.append(diagnostic)
 
+    # Overview table — quick recap of all ideas so the founder can scan the
+    # full slate after reading the detailed cards. Placed at the end so it
+    # serves as a TL;DR they land on after the full read-through.
+    out.append(_build_overview_table(ideas))
+
     out.append(
         "---\n\n"
         "_Run saved. Ask me to **show past runs**, change your settings "
@@ -187,6 +192,39 @@ def render_ideas(ideas: list, run_started: float | None = None, profile: dict | 
     )
 
     return "\n".join(out)
+
+
+def _build_overview_table(ideas: list) -> str:
+    """Render a compact recap table of all ideas (passed + flagged).
+
+    Two-line description per idea: line 1 is the tagline (elevator pitch),
+    line 2 is the unit-economics snapshot (category, AOV, capital). Uses
+    <br> for the in-cell line break — works in GitHub-flavoured markdown
+    and the renderers Claude Code uses.
+    """
+    if not ideas:
+        return ""
+
+    lines = [
+        "## Overview",
+        "",
+        "| # | Idea | Score | Status | Snapshot |",
+        "|---|------|-------|--------|----------|",
+    ]
+    for i, idea in enumerate(ideas, 1):
+        is_rejected = getattr(idea, "eval_status", "passed") == "rejected"
+        status = "⚠️ Flagged" if is_rejected else "✓ Passed"
+        title = (idea.title or "").replace("|", "\\|")
+        tagline = (_safe(idea.tagline, "") or "").replace("|", "\\|").replace("\n", " ").strip()
+        category = _humanize(idea.category) if idea.category else "—"
+        aov = _safe(getattr(idea, "aov_estimate", None), "—")
+        capital = _safe(getattr(idea, "capital_required_estimate", None), "—")
+        snapshot_line2 = f"_{category} · AOV {aov} · Capital {capital}_"
+        snapshot = f"{tagline}<br>{snapshot_line2}"
+        lines.append(f"| {i} | **{title}** | {idea.score_composite:.1f}/10 | {status} | {snapshot} |")
+
+    lines.append("")
+    return "\n".join(lines)
 
 
 def _build_diagnostic(rejected: list, passed: list, profile: dict | None) -> str:
