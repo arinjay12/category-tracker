@@ -5,6 +5,7 @@ Uses Claude Haiku for single-pass structured JSON scoring.
 import json
 import os
 import re
+import time
 import anthropic
 from utils.signal_schema import IdeaDict
 from utils.logger import get_logger
@@ -289,12 +290,22 @@ Ideas to score:
 {ideas_text}"""
 
     # Single-pass Haiku call — no tool use
-    response = client.messages.create(
-        model=model,
-        max_tokens=6000,
-        system=SYSTEM_PROMPT,
-        messages=[{"role": "user", "content": user_prompt}],
-    )
+    for attempt in range(3):
+        try:
+            response = client.messages.create(
+                model=model,
+                max_tokens=6000,
+                system=SYSTEM_PROMPT,
+                messages=[{"role": "user", "content": user_prompt}],
+            )
+            break
+        except Exception as e:
+            if "rate_limit" in str(e).lower() and attempt < 2:
+                wait = 60
+                logger.warning(f"[evaluation] rate limited — retrying in {wait}s (attempt {attempt + 1}/3)")
+                time.sleep(wait)
+            else:
+                raise
 
     text = "".join(b.text for b in response.content if hasattr(b, "text"))
     scores = _parse_scores(text)

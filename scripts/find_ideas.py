@@ -154,7 +154,7 @@ def _save_checkpoint(signals: list) -> None:
             "profile_hash": _profile_hash(),
             "signals": [dataclasses.asdict(s) for s in signals],
         }
-        CHECKPOINT_PATH().write_text(json.dumps(payload, indent=2, ensure_ascii=False))
+        CHECKPOINT_PATH().write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding='utf-8')
     except Exception as e:
         # Checkpoint is best-effort — never let it break the pipeline
         print(f"  - warning: checkpoint write failed: {e}", flush=True)
@@ -438,7 +438,7 @@ def main() -> int:
     from render_markdown import render_ideas
     rendered_md = render_ideas(scored, run_started=start, profile=profile)
     out_path = USER_DATA / "latest_ideas.md"
-    out_path.write_text(rendered_md)
+    out_path.write_text(rendered_md, encoding='utf-8')
 
     # Also write a structured JSON snapshot of the same ideas — useful for
     # any external tool that wants to consume the run output programmatically
@@ -461,7 +461,7 @@ def main() -> int:
         {"run_at": datetime.now(timezone.utc).isoformat(), "ideas": snapshot},
         indent=2,
     )
-    (USER_DATA / "latest_ideas.json").write_text(snapshot_json)
+    (USER_DATA / "latest_ideas.json").write_text(snapshot_json, encoding='utf-8')
 
     # Archive this run with a timestamp so past runs persist.
     # Format: user_data/runs/YYYY-MM-DD_HHMMSS_ideas.md (+ .json)
@@ -471,8 +471,8 @@ def main() -> int:
     run_stamp = datetime.now(timezone.utc).strftime("%Y-%m-%d_%H%M%S")
     archive_md = runs_dir / f"{run_stamp}_ideas.md"
     archive_json = runs_dir / f"{run_stamp}_ideas.json"
-    archive_md.write_text(rendered_md)
-    archive_json.write_text(snapshot_json)
+    archive_md.write_text(rendered_md, encoding='utf-8')
+    archive_json.write_text(snapshot_json, encoding='utf-8')
     # Archive write is silent — the user already saw the "Writing ideas" progress
     # line. The archive landing is implementation detail; surfacing it in chat
     # would just be noise.

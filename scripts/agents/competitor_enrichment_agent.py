@@ -432,18 +432,23 @@ Return ONLY a JSON object (NOT an array):
 Idea:
 {json.dumps(payload, indent=2)}"""
 
-    try:
-        response = client.messages.create(
-            model=model,
-            max_tokens=2000,
-            messages=[{"role": "user", "content": prompt}],
-        )
-        text = "".join(b.text for b in response.content if hasattr(b, "text"))
-        if "```json" in text:
-            text = text.split("```json")[1].split("```")[0]
-        elif "```" in text:
-            text = text.split("```")[1].split("```")[0]
-        return json.loads(text.strip())
-    except Exception as e:
-        logger.warning(f"[competitor_enrichment] per-idea synthesis error for '{idea.title}': {e}")
-        return {}
+    for attempt in range(3):
+        try:
+            response = client.messages.create(
+                model=model,
+                max_tokens=2000,
+                messages=[{"role": "user", "content": prompt}],
+            )
+            text = "".join(b.text for b in response.content if hasattr(b, "text"))
+            if "```json" in text:
+                text = text.split("```json")[1].split("```")[0]
+            elif "```" in text:
+                text = text.split("```")[1].split("```")[0]
+            return json.loads(text.strip())
+        except Exception as e:
+            if "rate_limit" in str(e).lower() and attempt < 2:
+                logger.warning(f"[competitor_enrichment] rate limited for '{idea.title}' — retrying in 60s (attempt {attempt + 1}/3)")
+                time.sleep(60)
+            else:
+                logger.warning(f"[competitor_enrichment] per-idea synthesis error for '{idea.title}': {e}")
+                return {}
