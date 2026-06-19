@@ -75,7 +75,7 @@ def render_ideas(ideas: list, run_started: float | None = None, profile: dict | 
     summary = " · ".join(summary_bits)
 
     out: list[str] = [
-        f"# D2C Idea Finder · {now}{duration}\n",
+        f"# Consumer Whitespace Tracker — TDV (auto-generated v0) · {now}{duration}\n",
         f"_{summary}. Passed ideas first (sorted by score), flagged ideas below with reasons._\n",
         "---\n",
     ]
@@ -90,53 +90,60 @@ def render_ideas(ideas: list, run_started: float | None = None, profile: dict | 
         out.append(header)
         out.append(f"_{idea.tagline}_  ·  **Category:** {_humanize(idea.category)}\n")
 
-        # If flagged, surface why right at the top so the founder doesn't
-        # read the whole card before realising it doesn't fit their constraints.
+        # If flagged, surface why right at the top.
         if is_rejected:
             raw_reasons = _safe(getattr(idea, "eval_reasons", ""), "")
             human_reasons = _humanize_eval_reasons(raw_reasons)
             out.append(f"> **Why flagged:** {human_reasons}\n")
 
-        # Core sections — bolded labels, paragraph values
+        # ── Tracker section order ──────────────────────────────────────────
+        # Category is already in the header line above.
+
+        # 1. Global signal (Why now + geo-arbitrage tag)
+        out.append(f"**Global signal (Why now)**\n{_safe(idea.why_now)}\n")
+
+        # 2. Problem + Target consumer (kept per KEEP list)
         out.append(f"**Problem**\n{_safe(idea.problem)}\n")
         out.append(f"**Target consumer**\n{_safe(idea.target_consumer)}\n")
-        out.append(f"**Why now**\n{_safe(idea.why_now)}\n")
-        out.append(f"**Hero product**\n{_safe(idea.hero_product)}\n")
 
-        # Unit economics line
-        out.append(
-            f"**Unit economics**  ·  "
-            f"AOV {_safe(idea.aov_estimate)}  ·  "
-            f"Margin {_safe(idea.margin_estimate)}  ·  "
-            f"Capital {_safe(idea.capital_required_estimate)}\n"
-        )
+        # 3. India status — first line of investability_read (label: "India status: …")
+        investability_text = _safe(getattr(idea, "investability_read", ""), "")
+        if investability_text and investability_text != "—":
+            lines = investability_text.split("\n")
+            india_status_line = lines[0].strip() if lines else ""
+            fundability_lines = "\n".join(l for l in lines[1:] if l.strip())
+        else:
+            india_status_line = ""
+            fundability_lines = ""
 
-        out.append(f"**Sourcing**\n{_safe(idea.sourcing_approach)}\n")
+        if india_status_line:
+            out.append(f"**India status**\n{india_status_line}\n")
+        else:
+            out.append("**India status**\n—\n")
 
-        # GTM = the ideal playbook for the product, regardless of which
-        # channels the founder has. Channel-match is captured separately in
-        # the distribution_fit sub-score.
-        out.append(f"**Go-to-market**\n{_safe(idea.gtm_tactics)}\n")
-
-        # Brand positioning (e.g. "honest", "premium", "playful") is a single-word
-        # output that doesn't earn a full section in chat — too thin to add value.
-        # Kept in the JSON schema + idea_agent prompt diversity constraint so:
-        #   (a) Sonnet still spreads ideas across positioning stances (forces idea variety)
-        #   (b) we can re-add display later if we ever surface it usefully (color-coded
-        #       chips, brand vibe summary, etc.)
-
-        # Only show AI angle when the idea actually has one — most ideas don't,
-        # and printing "none" everywhere just adds noise.
-        ai_angle = _safe(idea.ai_angle, "").strip().lower()
-        if ai_angle not in ("", "—", "none", "n/a", "null", "not applicable"):
-            out.append(f"**AI angle**\n{idea.ai_angle}\n")
-
-        out.append(f"**Wedge / why it wins**\n{_safe(idea.wedge)}\n")
-
-        # Competition
-        out.append(f"**Indian competitors**\n{_safe(idea.competitors_india)}\n")
+        # 4. Who's already here (Indian competitors + global reference brands)
+        out.append(f"**Who's already here (India)**\n{_safe(idea.competitors_india)}\n")
         if _safe(getattr(idea, "reference_brands_global", ""), "") not in ("", "—"):
             out.append(f"**Reference brands (global)**\n{idea.reference_brands_global}\n")
+
+        # 5. Investability read (full two-part section)
+        if fundability_lines or investability_text:
+            full_read = fundability_lines if fundability_lines else investability_text
+            out.append(f"**Investability read**\n{full_read}\n")
+        else:
+            out.append("**Investability read**\n—\n")
+
+        # 6. AOV + Margin inline only (no full unit-economics block, no sourcing/GTM)
+        out.append(
+            f"**Margin/AOV**  ·  "
+            f"AOV {_safe(idea.aov_estimate)}  ·  "
+            f"Margin {_safe(idea.margin_estimate)}\n"
+        )
+
+        # Founder-only fields (hero_product, sourcing_approach, gtm_tactics,
+        # capital_required_estimate, first_year_revenue_estimate) are preserved
+        # in the JSON/IdeaDict but intentionally omitted from this markdown view.
+        # They remain available in latest_ideas.json for programmatic use.
 
         # Sub-scores as a compact block.
         # Geo-arbitrage is suppressed when 0 (means "not a geo-arbitrage idea"
@@ -186,9 +193,9 @@ def render_ideas(ideas: list, run_started: float | None = None, profile: dict | 
 
     out.append(
         "---\n\n"
-        "_Run saved. Ask me to **show past runs**, change your settings "
-        "(*\"drop pet\"*, *\"bump capital to 15L\"*, *\"add fashion\"*), "
-        "or **find new d2c ideas**. Full output: `~/.claude/skills/india-d2c/user_data/latest_ideas.md`_\n"
+        "_Run saved. Ask me to **show past runs**, change tracked categories "
+        "(*\"drop pet\"*, *\"add fashion\"*), or **run the tracker again**. "
+        "Full output: `~/.claude/skills/india-d2c/user_data/latest_ideas.md`_\n"
     )
 
     return "\n".join(out)

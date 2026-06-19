@@ -124,5 +124,11 @@ class IdeaDict:
     eval_status: str = "passed"          # "passed" | "rejected"
     eval_reasons: str = ""               # comma-sep: "capital_fit", "launchability", "competition", "aov"
 
+    # Fund-facing investability read (TDV reframe). Two parts joined by newline:
+    #   line 1: "India status: <unfilled|weak incumbents|crowded> — <one-line justification>"
+    #   line 2+: two-line fundability take for an India consumer/D2C fund.
+    # Optional — empty string when not generated (backward-compatible).
+    investability_read: str = ""
+
     def to_dict(self) -> dict:
         return asdict(self)

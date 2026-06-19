@@ -1,12 +1,14 @@
 ---
 name: india-d2c
-description: Find launchable D2C product ideas for the Indian market, tuned to the user's taste, capital ceiling, distribution skills, and category preferences. Use when the user asks for D2C product ideas in India, wants to brainstorm consumer brand opportunities in India, wants to validate an Indian D2C idea, or wants to change their preferences (categories, capital, distribution channels, hard excludes) mid-conversation. Requires a one-time setup (~3 minutes) the first time it runs.
+description: Consumer Whitespace Tracker for India-focused consumer/D2C funds. Surfaces 5 rising global categories that are under-served in India, each with an investability read (India status, named competitors, and a fund-facing fundability take). Use when the user asks for consumer category whitespace in India, wants to identify fundable D2C opportunities for an India fund, wants to track geo-arbitrage or rising-brand-gap signals, or wants to update tracked categories and preferences. Requires a one-time setup (~3 minutes) the first time it runs.
 allowed-tools: Bash, Read, Write, Edit
 ---
 
-# D2C Idea Finder
+# Consumer Whitespace Tracker — TDV
 
-Runs a multi-stage agentic pipeline that surfaces 5 launchable Indian D2C product ideas, ranked and tagged (passed/flagged) against the user's taste profile. Five collectors pull signals: Indian marketplaces (Amazon.in, Flipkart, Nykaa, Myntra, Lenskart, FirstCry, and ~12 other specialist sites including quick commerce), per-category exploration queries (Reddit subs like r/IndianTech, r/AsianBeauty, r/IndianFood — plus YouTube reviews and Quora for categories where those communities are strong), 4 rotating US D2C trade publications (Modern Retail, Retail Brew, The Fascination, Exploding Topics), cross-platform Reddit + Amazon US for arbitrage signal, and Google Trends for US-vs-India interest gaps. Instagram is used only weakly in competitor enrichment (not in collection).
+Runs a multi-stage agentic pipeline that surfaces 5 rising consumer categories globally that are under-served in India — each assessed as a potential early-stage investment for an India-focused consumer/D2C fund. Output is a tracker with geo-arbitrage signals, India competitive status, named incumbents, and a frank fundability take per category.
+
+Five collectors pull signals: Indian marketplaces (Amazon.in, Flipkart, Nykaa, Myntra, Lenskart, FirstCry, and ~12 other specialist sites including quick commerce), per-category exploration queries (Reddit subs like r/IndianTech, r/AsianBeauty, r/IndianFood — plus YouTube reviews and Quora for categories where those communities are strong), 4 rotating US D2C trade publications (Modern Retail, Retail Brew, The Fascination, Exploding Topics), cross-platform Reddit + Amazon US for arbitrage signal, and Google Trends for US-vs-India interest gaps. Instagram is used only weakly in competitor enrichment (not in collection).
 
 ## How this skill works
 
@@ -21,16 +23,31 @@ The skill folder is at `~/.claude/skills/india-d2c/`. User data (profile, API ke
 ## When to invoke
 
 **Invoke this skill when the user:**
-- Asks "find me d2c ideas in India," "what should I build in Indian D2C," "any consumer brand opportunities in India," "d2c product ideas for India" or similar
-- Says "skip pet forever," "bump my capital to 15L," "I'm great at paid ads" (these are profile changes — see Step 3b)
-- Asks to "set up" or "configure" the India D2C idea finder
+- Asks "what consumer categories are rising globally and unfilled in India," "show me D2C whitespace for India," "what's investable in Indian consumer / D2C," "run the consumer tracker," or similar fund-facing questions
+- Says "skip pet forever," "add fashion to tracked categories," "drop wellness" (these are profile/category changes — see Step 3b)
+- Asks to "set up" or "configure" the India consumer whitespace tracker
 
-**Do NOT invoke for** general taste comments like "I like #3" or "the wellness angle is interesting" — just acknowledge those conversationally and ask if they want it translated into a profile change.
+**Do NOT invoke for** general taste comments like "I like #3" or "the wellness angle is interesting" — acknowledge conversationally and ask if they want a category change.
 
 **Do not invoke for:**
-- General market research that isn't about launching a D2C brand
-- SaaS or B2B idea generation (different skill)
+- General market research not related to Indian consumer/D2C investment
+- SaaS or B2B opportunity tracking (different skill)
 - Country-specific D2C outside India (this skill is India-focused)
+
+## What the output looks like
+
+Each run produces 5 tracker rows. Per row:
+- **Category** — the consumer category being assessed
+- **Global signal (Why now)** — what global brand/trend is rising and why the timing is now
+- **Problem** — the consumer pain driving demand in India
+- **Target consumer** — who the buyer is
+- **India status** — one of: unfilled / weak incumbents / crowded, with a one-line landscape read
+- **Who's already here** — named Indian incumbents + global reference brands
+- **Investability read** — a frank two-line take on whether this is a fundable early-stage bet for an India consumer fund, or why it isn't
+- **Margin/AOV** — indicative unit economics (inline only)
+- **Sub-scores** — demand, launchability, capital fit, competition headroom, distribution fit, geo-arbitrage
+
+Ideas are ranked by composite score and tagged passed/flagged. Flagged ideas still appear with the reason (e.g. "category too crowded").
 
 ## Step 1 — Check for first-time setup (MANDATORY)
 
@@ -317,23 +334,23 @@ When the shell exits (Monitor will signal this), read `user_data/latest_ideas.md
 **DO:**
 - Read the file with the Read tool
 - Output every line of the file content into the chat, with zero modifications
-- Include EVERY idea card with EVERY section that appears in the markdown file: `Problem`, `Target consumer`, `Why now`, `Hero product`, `Unit economics`, `Sourcing`, `Go-to-market`, `Wedge / why it wins`, `Indian competitors`, `Reference brands (global)`, `Sub-scores`. Plus the diagnostic block at the end if any ideas are flagged.
+- Include EVERY tracker row with EVERY section that appears in the markdown file: `Global signal (Why now)`, `Problem`, `Target consumer`, `India status`, `Who's already here (India)`, `Reference brands (global)`, `Investability read`, `Margin/AOV`, `Sub-scores`. Plus the diagnostic block at the end if any ideas are flagged.
 
 **DO NOT:**
-- Skip sections to make output shorter (this is the failure mode we've seen — Claude in chat drops `Indian competitors`, `Sourcing`, `Why now` etc. when relaying)
-- Summarise or paraphrase any section ("the wedge here is X" instead of the actual wedge text)
+- Skip sections to make output shorter (this is the failure mode we've seen — Claude in chat drops `India status`, `Who's already here`, `Investability read` etc. when relaying)
+- Summarise or paraphrase any section
 - Truncate competitor lists, leaving "...and others" instead of the full list
 - Reorder sections
-- Add commentary like "this idea looks great" or "I'd skip this one" before/between/after ideas
+- Add commentary like "this looks investable" or "I'd skip this one" before/between/after tracker rows
 - Drop sections marked as "—" or empty — render them as-is
 
 **Self-check before sending your reply:**
-1. Count the `## ` headings in the file you Read (one per idea). Your reply should have the same count of `## ` headings.
-2. Count `**Indian competitors**` sections in the file. Your reply should have the same count.
-3. Count `**Reference brands (global)**` sections in the file. Your reply should have the same count.
+1. Count the `## ` headings in the file you Read (one per tracker row). Your reply should have the same count of `## ` headings.
+2. Count `**India status**` sections in the file. Your reply should have the same count.
+3. Count `**Investability read**` sections in the file. Your reply should have the same count.
 4. If any of these counts don't match, you've dropped content — go back and emit the missing sections before sending.
 
-The file is typically ~300-500 lines for 5 ideas. Yes that's a long reply. Send it anyway. The user can scroll. Treating brevity as a virtue here costs the user real information they paid for (each idea is the output of ~$0.30 of LLM work + 12-18 min of pipeline time).
+The file is typically ~300-500 lines for 5 tracker rows. Yes that's a long reply. Send it anyway. The user can scroll. Treating brevity as a virtue here costs the user real information they paid for (each row is the output of ~$0.30 of LLM work + 12-18 min of pipeline time).
 
 **The rendered file already ends with a "What's next?" section** (file path reminder, how to revisit past runs, how to change profile, how to re-run). When you output it verbatim, that section comes along naturally — you do NOT need to add anything extra after it. Don't append your own commentary or summary after the file content.
 

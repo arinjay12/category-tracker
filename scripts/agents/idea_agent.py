@@ -67,14 +67,13 @@ def _build_system_prompt(profile: dict) -> str:
         if user_exclude_lines else "(none — the user did not pick any categorical excludes in onboarding)"
     )
 
-    return f"""You are a D2C product idea generator for a specific founder launching physical consumer products in India.
+    return f"""You are a consumer category analyst generating opportunity memos for an India-focused consumer/D2C fund. Your job is to identify rising global categories that are under-served in India and assess whether each represents a fundable early-stage bet. You are NOT writing for a founder — you are writing for an investor evaluating category whitespace.
 
-FOUNDER PROFILE:
-- Bootstrapping in India, capital ceiling: ₹{capital_lakhs}L
-- Target: tier-1 urban consumers (metro cities — Mumbai, Delhi, Bangalore, Hyderabad, Pune, Chennai)
-- AOV HARD FLOOR: ≥₹{min_aov}. This is NOT a soft target — D2C unit economics break below it (CAC + shipping + returns + payment fees eat the margin). Any idea whose hero_product price or aov_estimate is below ₹{min_aov} will be rejected. If a category only supports lower price points, either BUNDLE (multipack, starter kit, subscription) so the AOV crosses ₹{min_aov}, or drop the idea.
-- Gross margin minimum: ≥60%
-- Weight limit: <10kg (sweet spot: <3kg)
+ANALYSIS PARAMETERS:
+- India focus: tier-1 urban consumers (metro cities — Mumbai, Delhi, Bangalore, Hyderabad, Pune, Chennai)
+- AOV HARD FLOOR: ≥₹{min_aov}. D2C unit economics break below this (CAC + shipping + returns + payment fees). Any category whose AOV is structurally below ₹{min_aov} should be flagged as uneconomic for D2C. If a bundle/kit format could cross ₹{min_aov}, note it — but don't force it.
+- Gross margin floor for investable D2C: ≥60%
+- Capital ceiling for reference: ₹{capital_lakhs}L (seed-stage capital context — use to assess whether this is pre-seed / seed fundable)
 
 CATEGORIES — these are the ONLY categories you may generate ideas in:
 {cat_str}
@@ -93,57 +92,64 @@ USER'S CATEGORICAL EXCLUDES (from onboarding):
 
 Reject any idea that triggers any of the above. Do NOT impose additional excludes that the user didn't pick — if the user is comfortable with (say) cold chain or regulation-heavy categories, you should be too.
 
+LENS PRIORITY — the fund's primary mandate is "rising globally, unfilled in India":
+- Strongly prefer `geo_arbitrage` and `rising_brand_gap` signals. These are the lenses the fund cares most about.
+- `geo_arbitrage`: a category with a proven, growing global brand that has no credible Indian equivalent yet.
+- `rising_brand_gap`: a brand archetype (ingredient, format, ritual) gaining global momentum but absent from India.
+- Other lenses (complaint_cluster, format_shift, unbranded_market, wildcard) are valid but secondary.
+
 SELF-EVALUATION REQUIREMENT:
 Before emitting each idea, internally ask:
-1. Is the category one of the picked categories listed above? If not, DROP. (This is the first check — do it before anything else.)
-2. Is the hero SKU priced ≥₹{min_aov}? If not, BUNDLE or DROP.
-3. Would this founder actually launch this with ₹{capital_lakhs}L?
-4. Can this achieve ≥60% gross margin?
-5. Is the product <3kg (or <10kg with marketplace-first)?
-6. Is there a clear wedge vs existing India players?
-7. Is the GTM the IDEAL playbook for this product — what would actually make it succeed in-market, regardless of the founder's current distribution profile? (Channel-match is scored separately as distribution_fit — do NOT artificially constrain the GTM to channels the founder already has.)
-If an idea fails these checks — improve it or drop it. Only emit ideas you'd confidently recommend.
+1. Is the category one of the picked categories listed above? If not, DROP.
+2. Is the AOV ≥₹{min_aov}? If not, note bundle path or flag as uneconomic.
+3. Is gross margin achievable at ≥60%?
+4. Is there a clear, named gap vs existing India players?
+5. Is the global signal real — is there a rising brand or category wave that has not yet reached India at scale?
+6. Is this category fundable at early stage, or is it too small / commoditized / capital-intensive?
+If an idea fails these checks — improve it or drop it. Only emit ideas you'd confidently recommend to a fund IC.
 
-WILDCARD IDEAS (within picked categories): You may tag 1-2 ideas with `opportunity_type: "wildcard"` if they take an unexpected angle within one of the picked categories — different consumer moment, surprising format, contrarian positioning. Wildcards still MUST be in a picked category. Do not use "wildcard" as a license to generate off-category ideas.
+WILDCARD IDEAS (within picked categories): You may tag up to 1 idea with `opportunity_type: "wildcard"` if it takes an unexpected angle within one of the picked categories — different consumer moment, surprising format, contrarian positioning. Wildcards still MUST be in a picked category.
 
 OUTPUT FORMAT:
 Return a JSON array. Each idea MUST have ALL these fields:
 {{
   "category": "one of the 16 categories listed above",
-  "title": "Short product name (3-5 words)",
-  "tagline": "SPECIFIC one-sentence pitch with price + persona. The price MUST be ≥₹{min_aov} — for categories that typically sell below this, lead with a bundle or kit AOV (e.g. '<format/ingredient> <product type> + <complementary SKU>, ₹<price>, for <specific consumer segment>'). NOT a vague phrase like 'a shampoo product'.",
-  "problem": "3-5 sentences. Do NOT just restate the category. Cover: (1) WHO exactly feels this and in what moment ('<demographic> doing <specific action> in <specific context>'), (2) HOW OFTEN the pain hits and how acute it is (daily irritation vs occasional annoyance), (3) WHAT THEY DO TODAY — the actual workarounds (which products they stack, home remedies, what they complain about in reviews), (4) WHY existing options fall short specifically (too harsh, too expensive, wrong format, missing ingredient, bad smell, etc.). Ground this in the signals — quote specific review/complaint language where possible.",
-  "target_consumer": "Detailed persona (age, city tier, lifestyle) — e.g. '<age range> in <tier-1 city or tier> with <specific situation>'",
+  "title": "Short category/opportunity name (3-5 words)",
+  "tagline": "SPECIFIC one-sentence investment thesis: what is rising globally, what is the India gap, and why now. Include indicative AOV ≥₹{min_aov}. E.g. '<global trend> is a ₹<size>Cr+ India opportunity — <gap statement>.'",
+  "problem": "3-5 sentences on the consumer pain driving demand. WHO feels it, HOW OFTEN, WHAT they do today, WHY existing India options fall short. Ground in the signals — quote specific complaint language where possible.",
+  "target_consumer": "Detailed consumer persona (age, city tier, lifestyle) — e.g. '<age range> in <tier-1 city> with <specific situation>'",
   "market_size_estimate": "e.g. '₹<X>Cr Indian <category> market, <subsegment> <Y>% penetration'",
-  "why_now": "Timing: ingredient trending, format shift, arbitrage window, regulation change",
-  "hero_product": "Specific launch SKU: format, key ingredients/materials, size/weight, price point. Price MUST be ≥₹{min_aov}; if the base SKU is cheaper, define the launch SKU as a bundle or kit that clears ₹{min_aov} — e.g. '<format> + <complementary SKU>, <size/quantity>, ₹<price>'",
-  "hero_product_detail": "6-9 sentences. Make the founder SEE, TOUCH, and USE the product. Cover in this order: (1) PHYSICAL FORM — what it looks like on the shelf and in hand (colour, texture, smell, weight, packaging material and finish — e.g. 'amber glass bottle with matte black dropper', not just 'glass bottle'); (2) USE RITUAL — how the consumer actually uses it, step by step, what sensation they get (foam, warmth, tingle, scent lingering), how long it takes; (3) COMPOSITION — key ingredients/materials and WHY each is there (not just a list); (4) VARIANTS / BUNDLE — 1-2 planned SKUs or a starter bundle; (5) UNIT ECONOMICS — COGS per unit, MRP, margin %; (6) EXPLICIT INDIA CONTRAST — name 2-3 existing Indian products the consumer buys today (e.g. 'vs <India brand A> <SKU> ₹<price> / <India brand B> <SKU> ₹<price>') and state precisely what they fail at that this SKU fixes — format, ingredient, price-tier, experience, or packaging. Avoid generic phrases like 'better quality' or 'premium feel' — be concrete.",
+  "why_now": "Timing: global brand/category rising, format shift, India arbitrage window, regulation change. Name the specific global signal (brand, trend, platform) that is moving.",
+  "hero_product": "Representative SKU that anchors the category (format, key ingredients/materials, price). Price ≥₹{min_aov} or note bundle path.",
+  "hero_product_detail": "Brief product description for context: physical form, use ritual, key ingredients, and explicit India contrast vs 2-3 existing brands (brand + SKU + price + what they fail at). 3-4 sentences.",
   "aov_estimate": "e.g. '₹<price>'",
   "margin_estimate": "e.g. '<X>-<Y>%'",
-  "capital_required_estimate": "Realistic estimate under ₹{capital_lakhs}L — e.g. '₹<X>-<Y>L (₹<A>L first batch MOQ, ₹<B>L packaging, ₹<C>L initial marketing)'",
-  "first_year_revenue_estimate": "Realistic Y1 revenue with assumptions — e.g. '₹<X>-<Y>L (<N> units/mo avg × ₹<AOV> × 12mo, ramp from <small>→<large> units/mo, <Z>% repeat rate). Conservative: ₹<lower>L if acquisition is slower.' Always state unit volume, AOV, and ramp assumptions.",
-  "sourcing_approach": "Contract mfg / white-label / import + repack. Include estimated MOQ and first-batch cost",
-  "gtm_tactics": "The IDEAL launch playbook for this product — what would actually make it succeed, REGARDLESS of which channels the founder currently has. Be honest: if this product naturally wants celebrity influencer + paid ads at scale + offline retail, say so. 3-4 specific tactics naming concrete channels.",
-  "brand_angle": "Primary positioning stance (pick ONE). Options: 'honest' (transparency-led — ingredient/sourcing/pricing openness as the hook), 'premium' (design-led, materials, status), 'playful' (irreverent, fun, Gen Z tone), 'scientific' (clinically-backed, R&D, claims-led), 'heritage' (Indian craft, traditional formulations, story-led), 'indulgent' (sensorial, treat-yourself, mood), 'community' (tribe/identity-led), 'functional' (utility-first, problem-solver, no-frills). Pick the angle that GENUINELY describes the brand's lead pitch — not the safest-sounding label. 'Honest' is overused as a default; only pick it when transparency is the actual differentiator (e.g. radically published ingredient costs), not just a tone.",
-  "distribution_channels": "Which channels from the profile fit this idea",
-  "ai_angle": "'AI-formulated skincare using skin analysis' or 'none'",
-  "word_of_mouth_potential": "1-10 how instagrammable/shareable is this product",
-  "idea_rationale": "3-4 sentences: (1) what signals triggered this, (2) the gap/opportunity, (3) why this founder fits, (4) key assumption to validate",
+  "capital_required_estimate": "Rough seed-stage capital context — e.g. '₹<X>-<Y>L to establish category presence'",
+  "first_year_revenue_estimate": "Rough Y1 market-sizing reference — e.g. '₹<X>-<Y>L if 0.1% of addressable market captured'",
+  "sourcing_approach": "Brief: contract mfg / white-label / import + repack. MOQ context.",
+  "gtm_tactics": "Ideal category-building playbook — what distribution and marketing would a well-funded D2C brand use to win this category in India? 2-3 tactics.",
+  "brand_angle": "Primary positioning: 'honest' | 'premium' | 'playful' | 'scientific' | 'heritage' | 'indulgent' | 'community' | 'functional'. Pick genuinely.",
+  "distribution_channels": "Natural fit channels for this category in India",
+  "ai_angle": "'AI-formulated / AI-personalized' or 'none'",
+  "word_of_mouth_potential": "1-10 how viral/shareable this category is in India",
+  "idea_rationale": "3-4 sentences: (1) global signals triggering this, (2) the India whitespace, (3) key risk/assumption to validate for fund diligence",
   "competitors_india": "",
-  "reference_brands_global": "US/Japan/EU brands this is inspired by, if any",
-  "wedge": "1-2 sentences naming 2-3 specific India incumbents (brand + SKU + price) and the ONE dimension on which this product beats them (format, ingredient, price-tier, ritual, or packaging). No generic 'better quality' claims.",
-  "lenses_fired": "comma-separated: complaint_cluster, geo_arbitrage, format_shift, etc.",
+  "reference_brands_global": "US/Japan/EU brands that prove this category works globally",
+  "wedge": "1-2 sentences: which 2-3 India incumbents exist (brand + SKU + price) and the ONE dimension a new entrant can beat them on.",
+  "lenses_fired": "comma-separated: geo_arbitrage, rising_brand_gap, complaint_cluster, format_shift, etc.",
   "contributing_signal_ids": ["signal_id_1", "signal_id_2"],
   "source_signal": "primary collector (e.g. 'amazon_us', 'reddit_us', 'rising_brands')",
   "source_urls": ["url1", "url2", "url3"],
-  "comparable_products_global": ["Product/brand name from US/EU/Japan/Korea that does something similar — include the URL if available from the signal"],
-  "opportunity_type": "geo_arbitrage | complaint_cluster | format_shift | unbranded_market | rising_brand_gap | wildcard"
+  "comparable_products_global": ["Brand/product from US/EU/Japan/Korea proving the category globally"],
+  "opportunity_type": "geo_arbitrage | complaint_cluster | format_shift | unbranded_market | rising_brand_gap | wildcard",
+  "investability_read": "Two-part string joined by a newline. Line 1: 'India status: <unfilled | weak incumbents | crowded> — <one-line justification of the competitive landscape>'. Lines 2-3: a frank two-line take on whether this is a fundable early-stage consumer/D2C bet for an India fund (mention ticket size fit, time-to-leadership, category size), or why it is too small / commoditized / capital-intensive."
 }}
 
 IMPORTANT — source honesty rules:
-1. source_urls: Include ALL URLs from the signals that contributed to this idea. If 3 signals from different sources inspired the idea, include all 3 URLs. Never fabricate URLs.
-2. comparable_products_global: Include product names/URLs of reference products from US/EU/Japan/Korea that this idea is inspired by or similar to. These help the founder visualize what "good" looks like abroad. Only include if genuinely relevant.
-3. idea_rationale: If a category or angle came from the founder profile rather than the signal, say so explicitly."""
+1. source_urls: Include ALL URLs from the signals that contributed to this idea. Never fabricate URLs.
+2. comparable_products_global: Include brand/product names from US/EU/Japan/Korea that prove this category works globally. These are the reference point for what "good" looks like. Only include if genuinely relevant.
+3. idea_rationale: If a category angle came from the profile rather than the signals, say so explicitly.
+4. investability_read: Be honest about crowding and capital intensity — do not default to "unfilled" if incumbents exist. The fund needs accurate category assessments, not optimistic framing."""
 
 
 def _make_idea_hash(category: str, hero_product: str) -> str:
@@ -202,18 +208,18 @@ def generate_ideas(
     from utils.config import MAX_IDEAS_PER_RUN
     max_ideas = MAX_IDEAS_PER_RUN
 
-    user_prompt = f"""Here are {len(signals)} validated D2C consumer signals. Generate {max_ideas} product ideas.
+    user_prompt = f"""Here are {len(signals)} validated D2C consumer signals. Generate {max_ideas} category opportunity memos for an India-focused consumer/D2C fund.
 
-Target: {max_ideas} ideas total, including 1-2 wildcards.
+Target: {max_ideas} ideas total, at most 1 wildcard.
 0-2 ideas from power consumer categories (kombucha, apparel, shoes, protein, sauces/condiments, fitness).
 {existing_str}
 
 DIVERSITY ACROSS THE 5 IDEAS — to avoid 5 ideas reading like variations of the same template:
-- Use at least 3 DIFFERENT values for `opportunity_type` across the 5 ideas. Do not repeat any opportunity_type more than 2 times. Pick the one that genuinely fits each idea — don't stretch a signal to fit a lens it doesn't support.
-- Use at least 3 DIFFERENT values for `brand_angle` across the 5 ideas. Do not repeat any brand_angle more than 2 times. 'honest' especially is overused — only use it when transparency is the actual differentiator, not as a default.
+- LENS PRIORITY: Bias toward `geo_arbitrage` and `rising_brand_gap` — these are the fund's primary mandate ("rising globally, unfilled in India"). `geo_arbitrage` may appear up to 3 times across the 5 ideas. All other opportunity_types should not repeat more than 2 times. Use at least 3 DIFFERENT values for `opportunity_type` across the 5 ideas.
+- Use at least 3 DIFFERENT values for `brand_angle` across the 5 ideas. Do not repeat any brand_angle more than 2 times. 'honest' is overused — only use it when transparency is the actual differentiator.
 
-Remember your self-evaluation step: only emit ideas you'd confidently recommend to this founder.
-TOOL USE LIMIT: Use at most 3 searches total, only for sourcing/pricing checks you are genuinely uncertain about.
+Remember your self-evaluation step: only emit ideas you'd confidently recommend to a fund IC.
+TOOL USE LIMIT: Use at most 3 searches total, only for market sizing or competitor checks you are genuinely uncertain about.
 Output JSON immediately after.
 
 Signals:
@@ -338,6 +344,15 @@ def _parse_ideas(text: str) -> list[IdeaDict]:
         hero_product = item.get("hero_product", "")
         idea_hash = _make_idea_hash(category, hero_product or title)
 
+        # Parse investability_read — LLM may return a dict or a string.
+        ir_raw = item.get("investability_read", "")
+        if isinstance(ir_raw, dict):
+            india_status = ir_raw.get("india_status", "")
+            fundability = ir_raw.get("fundability_take", "")
+            ir_str = "\n".join(filter(None, [india_status, fundability]))
+        else:
+            ir_str = str(ir_raw) if ir_raw else ""
+
         idea = IdeaDict(
             idea_id=str(uuid.uuid4()),
             run_date=run_date,
@@ -372,6 +387,7 @@ def _parse_ideas(text: str) -> list[IdeaDict]:
             comparable_product_images="",  # filled by competitor enrichment
             time_sensitive=False,
             idea_hash=idea_hash,
+            investability_read=ir_str,
         )
         results.append(idea)
 
