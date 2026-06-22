@@ -80,6 +80,76 @@ Title changed from `D2C Idea Finder` to `Consumer Whitespace Tracker — TDV`.
 
 ---
 
+## 2b. Phase 2 — category recut + VC optimization (2026-06-22)
+
+Six further changes after the first full run, focused on tightening the tool to TDV's mandate and reducing cost-per-run.
+
+### Change 5 — Category set recut from 16 to 13 TDV-mandate-aligned categories
+
+**Removed 6 categories** (not addressable with D2C signal pipeline, outside TDV mandate, or too early):
+`footwear`, `innerwear_loungewear`, `eyewear_accessories`, `accessories`, `consumer_electronics`, `baby_kids`
+
+**Added 3 new categories** that reflect TDV's actual thesis areas:
+- `cognitive_wellness` — nootropics, lion's mane, bacopa, focus supplements, brain health
+- `spiritual_lifestyle` — premium incense, meditation tools, upgraded puja accessories, ayurvedic self-care
+- `sleep_recovery` — sleep supplements (magnesium, glycine), recovery tools, sleep hygiene products
+
+All 5 collectors (india_marketplaces, amazon_us, rising_brands, exploration, google_trends) were updated to match the 13-category set.
+
+### Change 6 — Remove D2C-specific generation fields (cost reduction)
+
+Six fields removed from Sonnet's JSON output schema, saving ~30% of output token cost per run:
+
+| Removed field | Why |
+|---|---|
+| `hero_product` | Specific SKU spec — useful for a launching founder, noise for fund screening |
+| `hero_product_detail` | Expanded SKU description — same reason |
+| `sourcing_approach` | Contract mfg / MOQ — irrelevant at IC screening stage |
+| `gtm_tactics` | Launch playbook — the investee team decides this, not us |
+| `first_year_revenue_estimate` | Unreliable Y1 projections — bottom-up TAM is already in `market_size_estimate` |
+| `ai_angle` | "AI-formulated or none" flag — not a VC screening signal |
+
+Fields are **kept in the schema** (backward-compatible with existing checkpoints) but default to empty string on new runs.
+
+### Change 7 — Add VC-specific generation fields (zero extra cost)
+
+Three fields added to Sonnet's output schema, replacing the removed D2C fields at no net token increase:
+
+| New field | What it answers |
+|---|---|
+| `exit_comps` | Global acquisition that proves this category is fundable — e.g. *"Four Sigmatic acquired by P&G (2021)"* |
+| `repeat_purchase` | `repeat / one-time / occasion` + repurchase interval — key LTV signal for fund thesis |
+| `india_timing` | `early (3+ yrs behind global) / on-time (1-2 yrs) / late (already seeded)` + evidence |
+
+### Change 8 — TDV portfolio flag (Python-side, zero LLM cost)
+
+After evaluation, each idea gets a `portfolio_flag` set from a hardcoded TDV portfolio lookup — no API call, no extra cost. Tells the analyst in one line whether TDV already has a co in this category:
+
+```
+TDV portfolio by category:
+  beauty:             Kindlife, Stealth Beauty
+  home:               Goodmelts, Zulu Club
+  wellness:           SoulSensei, Stealth Wellness
+  pet:                Stealth Pet Care
+  fashion_apparel:    Rapawalk, The Fourth Layer
+  jewellery_watches:  Eternz
+  food_cpg:           Acai Theory
+  cognitive_wellness: Ivory
+  spiritual_lifestyle: SoulSensei, DevDham, Apps For Bharat
+  sleep_recovery:     Stealth Wellness
+```
+
+### Change 9 — New India funding collector (`india_funding_collector.py`)
+
+Exa-only collector (no Claude calls) that queries **Inc42, YourStory, and Entrackr** for recent India startup funding rounds per category. 2 queries per picked category, max 6 per run. Signals the idea agent that a category is already attracting capital — both a validation signal and a competition signal. Adds ~6 Exa calls per run (within free tier).
+
+### Change 10 — Evaluation rubric updates
+
+- **Removed `ai_angle` bonus** from composite score (field no longer generated)
+- **Reframed `score_distribution` rubric**: from "what fraction of the founder's GTM tactics are available to this founder?" → "how accessible are D2C channels for this category in India?" — a VC screening question, not a founder operational question. The rubric now scores category-level channel accessibility (influencer, QC, organic search) rather than founder-specific channel match.
+
+---
+
 ## 3. Why this helps us as a micro VC
 
 The original tool answered: *"Can this founder launch this product?"*

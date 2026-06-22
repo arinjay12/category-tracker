@@ -300,6 +300,7 @@ def main() -> int:
         from collectors.google_trends_collector import GoogleTrendsCollector
         from collectors.exploration_collector import ExplorationCollector
         from collectors.india_marketplaces_collector import IndiaMarketplacesCollector
+        from collectors.india_funding_collector import IndiaFundingCollector
 
         # Order matters for user-facing streaming: most-important / most-direct
         # signal source first, so the user sees the India-first character of
@@ -307,6 +308,7 @@ def main() -> int:
         # Display labels are user-friendly versions of the internal source_name.
         for label, ctor in (
             ("Indian marketplaces", IndiaMarketplacesCollector),
+            ("India funding news", IndiaFundingCollector),
             ("Adaptive discovery", ExplorationCollector),
             ("US D2C publications", RisingBrandsCollector),
             ("US Amazon + Reddit", AmazonUSCollector),
@@ -408,6 +410,27 @@ def main() -> int:
     except Exception as e:
         print(f"\nEvaluation failed: {e}", file=sys.stderr)
         return 1
+
+    # Portfolio flag — Python-side lookup, no LLM call needed.
+    # Tells the analyst whether TDV already has a portfolio co in this category.
+    _TDV_PORTFOLIO = {
+        "beauty": ["Kindlife", "Stealth Beauty"],
+        "home": ["Goodmelts", "Zulu Club"],
+        "wellness": ["SoulSensei", "Stealth Wellness"],
+        "pet": ["Stealth Pet Care"],
+        "fashion_apparel": ["Rapawalk", "The Fourth Layer"],
+        "jewellery_watches": ["Eternz"],
+        "food_cpg": ["Acai Theory"],
+        "cognitive_wellness": ["Ivory"],
+        "spiritual_lifestyle": ["SoulSensei", "DevDham", "Apps For Bharat"],
+        "sleep_recovery": ["Stealth Wellness"],
+    }
+    for _idea in scored:
+        _existing = _TDV_PORTFOLIO.get(_idea.category, [])
+        if _existing:
+            _idea.portfolio_flag = f"TDV has {', '.join(_existing)} — check for conflict or follow-on"
+        else:
+            _idea.portfolio_flag = "No current TDV portfolio overlap"
 
     from utils.config import FILTERS
     min_composite = FILTERS["min_composite_score"]

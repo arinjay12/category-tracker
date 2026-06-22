@@ -133,6 +133,21 @@ def render_ideas(ideas: list, run_started: float | None = None, profile: dict | 
         else:
             out.append("**Investability read**\n—\n")
 
+        # 5b. VC-specific context fields (TDV reframe v2)
+        exit_comps_text = _safe(getattr(idea, "exit_comps", ""), "")
+        repeat_purchase_text = _safe(getattr(idea, "repeat_purchase", ""), "")
+        india_timing_text = _safe(getattr(idea, "india_timing", ""), "")
+        portfolio_flag_text = _safe(getattr(idea, "portfolio_flag", ""), "")
+
+        if exit_comps_text not in ("", "—"):
+            out.append(f"**Exit comps**\n{exit_comps_text}\n")
+        if repeat_purchase_text not in ("", "—"):
+            out.append(f"**Repeat purchase**\n{repeat_purchase_text}\n")
+        if india_timing_text not in ("", "—"):
+            out.append(f"**India timing**\n{india_timing_text}\n")
+        if portfolio_flag_text not in ("", "—"):
+            out.append(f"**TDV portfolio**\n{portfolio_flag_text}\n")
+
         # 6. AOV + Margin inline only (no full unit-economics block, no sourcing/GTM)
         out.append(
             f"**Margin/AOV**  ·  "

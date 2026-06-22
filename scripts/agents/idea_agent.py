@@ -120,18 +120,15 @@ Return a JSON array. Each idea MUST have ALL these fields:
   "target_consumer": "Detailed consumer persona (age, city tier, lifestyle) — e.g. '<age range> in <tier-1 city> with <specific situation>'",
   "market_size_estimate": "e.g. '₹<X>Cr Indian <category> market, <subsegment> <Y>% penetration'",
   "why_now": "Timing: global brand/category rising, format shift, India arbitrage window, regulation change. Name the specific global signal (brand, trend, platform) that is moving.",
-  "hero_product": "Representative SKU that anchors the category (format, key ingredients/materials, price). Price ≥₹{min_aov} or note bundle path.",
-  "hero_product_detail": "Brief product description for context: physical form, use ritual, key ingredients, and explicit India contrast vs 2-3 existing brands (brand + SKU + price + what they fail at). 3-4 sentences.",
   "aov_estimate": "e.g. '₹<price>'",
   "margin_estimate": "e.g. '<X>-<Y>%'",
   "capital_required_estimate": "Rough seed-stage capital context — e.g. '₹<X>-<Y>L to establish category presence'",
-  "first_year_revenue_estimate": "Rough Y1 market-sizing reference — e.g. '₹<X>-<Y>L if 0.1% of addressable market captured'",
-  "sourcing_approach": "Brief: contract mfg / white-label / import + repack. MOQ context.",
-  "gtm_tactics": "Ideal category-building playbook — what distribution and marketing would a well-funded D2C brand use to win this category in India? 2-3 tactics.",
   "brand_angle": "Primary positioning: 'honest' | 'premium' | 'playful' | 'scientific' | 'heritage' | 'indulgent' | 'community' | 'functional'. Pick genuinely.",
-  "distribution_channels": "Natural fit channels for this category in India",
-  "ai_angle": "'AI-formulated / AI-personalized' or 'none'",
+  "distribution_channels": "Natural fit channels for this category in India (influencer, QC, marketplace, organic search, offline, etc.)",
   "word_of_mouth_potential": "1-10 how viral/shareable this category is in India",
+  "exit_comps": "One global exit proving this category is fundable — e.g. 'Four Sigmatic acquired by P&G (2021) — validates adaptogen functional food as a strategic consumer category'. One sentence max.",
+  "repeat_purchase": "'repeat | one-time | occasion' — add a one-line note on repurchase interval (e.g. 'repeat — monthly replenishment cycle, ~30-day supply')",
+  "india_timing": "'early (3+ yrs behind global) | on-time (1-2 yrs behind) | late (already seeded in India)' — one-line evidence for the timing read",
   "idea_rationale": "3-4 sentences: (1) global signals triggering this, (2) the India whitespace, (3) key risk/assumption to validate for fund diligence",
   "competitors_india": "",
   "reference_brands_global": "US/Japan/EU brands that prove this category works globally",
@@ -341,8 +338,7 @@ def _parse_ideas(text: str) -> list[IdeaDict]:
 
         title = item["title"]
         category = item.get("category", "")
-        hero_product = item.get("hero_product", "")
-        idea_hash = _make_idea_hash(category, hero_product or title)
+        idea_hash = _make_idea_hash(category, title)
 
         # Parse investability_read — LLM may return a dict or a string.
         ir_raw = item.get("investability_read", "")
@@ -363,17 +359,17 @@ def _parse_ideas(text: str) -> list[IdeaDict]:
             target_consumer=_str_field(item, "target_consumer"),
             market_size_estimate=_str_field(item, "market_size_estimate"),
             why_now=_str_field(item, "why_now"),
-            hero_product=hero_product,
-            hero_product_detail=_str_field(item, "hero_product_detail"),
+            hero_product="",
+            hero_product_detail="",
             aov_estimate=_str_field(item, "aov_estimate"),
             margin_estimate=_str_field(item, "margin_estimate"),
             capital_required_estimate=_str_field(item, "capital_required_estimate"),
-            first_year_revenue_estimate=_str_field(item, "first_year_revenue_estimate"),
-            sourcing_approach=_str_field(item, "sourcing_approach"),
-            gtm_tactics=_str_field(item, "gtm_tactics"),
+            first_year_revenue_estimate="",
+            sourcing_approach="",
+            gtm_tactics="",
             brand_angle=_str_field(item, "brand_angle"),
             distribution_channels=_str_field(item, "distribution_channels"),
-            ai_angle=_str_field(item, "ai_angle", default="none"),
+            ai_angle="none",
             word_of_mouth_potential=_str_field(item, "word_of_mouth_potential"),
             idea_rationale=_str_field(item, "idea_rationale"),
             competitors_india="",  # filled by competitor enrichment later
@@ -388,6 +384,9 @@ def _parse_ideas(text: str) -> list[IdeaDict]:
             time_sensitive=False,
             idea_hash=idea_hash,
             investability_read=ir_str,
+            exit_comps=_str_field(item, "exit_comps"),
+            repeat_purchase=_str_field(item, "repeat_purchase"),
+            india_timing=_str_field(item, "india_timing"),
         )
         results.append(idea)
 

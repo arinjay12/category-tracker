@@ -130,5 +130,11 @@ class IdeaDict:
     # Optional — empty string when not generated (backward-compatible).
     investability_read: str = ""
 
+    # VC-specific fields added in TDV reframe v2
+    exit_comps: str = ""        # global exit that proves category fundability
+    repeat_purchase: str = ""   # "repeat | one-time | occasion" + repurchase interval
+    india_timing: str = ""      # "early | on-time | late" + one-line evidence
+    portfolio_flag: str = ""    # TDV portfolio adjacency or conflict, set post-evaluation
+
     def to_dict(self) -> dict:
         return asdict(self)

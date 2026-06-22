@@ -183,24 +183,17 @@ score_competition (1-10): INVERTED — higher = LESS competition (good)
   3-4 = multiple strong players (well-funded D2C incumbents in this category), need strong wedge
   1-2 = dominated by well-funded incumbents (HUL, P&G, Dabur) or saturated D2C space
 
-score_distribution (1-10): How much of the IDEAL GTM can THIS founder execute today?
+score_distribution (1-10): How accessible are D2C channels for this category in India?
 
-  The idea's `gtm_tactics` field is the UNBIASED ideal playbook for this product —
-  what would actually make it succeed regardless of who's launching it.
+  The idea's `distribution_channels` field lists the natural-fit channels for this category.
+  Consider how well the category maps to cost-efficient early-stage D2C acquisition in India:
+  influencer, quick commerce, organic search, marketplace SEO, or community-driven.
 
-  Read it and ask: "what fraction of these tactics can this founder run with
-  their current distribution channels (see FOUNDER CONTEXT above)?"
-
-  10 = every channel in the ideal playbook is available to the founder
-  7-9 = most channels are available; one or two secondary channels missing
-  5-6 = half the ideal needs channels the founder doesn't have
-  3-4 = most of the ideal needs channels the founder doesn't have
-  1-2 = ideal requires channels the founder has explicitly scored 0 on
-
-  Important: do NOT score based on whether gtm_tactics merely mentions channels
-  from the founder's profile. That alone is meaningless — the idea agent could
-  always do that. Score based on the REAL OVERLAP between what the product
-  needs and what the founder can deliver.
+  10 = category naturally drives via low-CAC organic channels (influencer, QC, Reddit/YouTube discovery)
+  7-9 = strong fit for 2+ accessible India D2C channels; minimal expensive or offline dependency
+  5-6 = mixed — some accessible channels exist but offline or paid media dependency is meaningful
+  3-4 = primarily needs expensive, hard-to-access channels (TV, pharmacy shelf, doctor recommendation)
+  1-2 = D2C channel fit is weak — category is dominated by offline retail, pharma, or B2B distribution
 
 Also assess:
 - eval_flags: array of strings — specific issues like "cold chain risk", "FSSAI nutraceutical complex",
@@ -262,14 +255,10 @@ def evaluate_ideas(ideas: list[IdeaDict], profile: dict) -> list[IdeaDict]:
             "category": idea.category,
             "problem": idea.problem,
             "target_consumer": idea.target_consumer,
-            "hero_product": idea.hero_product,
             "aov_estimate": idea.aov_estimate,
             "margin_estimate": idea.margin_estimate,
             "capital_required_estimate": idea.capital_required_estimate,
-            "sourcing_approach": idea.sourcing_approach,
-            "gtm_tactics": idea.gtm_tactics,
             "distribution_channels": idea.distribution_channels,
-            "ai_angle": idea.ai_angle,
             "word_of_mouth_potential": idea.word_of_mouth_potential,
             "wedge": idea.wedge,
             "competitors_india": idea.competitors_india,
@@ -368,9 +357,6 @@ Ideas to score:
 
         # Apply thematic bonus multiplier
         bonus_multiplier = 1.0
-        ai = idea.ai_angle.lower() if idea.ai_angle else ""
-        if ai and ai != "none":
-            bonus_multiplier += bonuses.get("ai_formulated", 0.10)
 
         brand = idea.brand_angle.lower() if idea.brand_angle else ""
         if "honest" in brand or "transparent" in brand:
@@ -397,7 +383,7 @@ Ideas to score:
         # Reasons are plain-language, not raw score thresholds. Score is shown
         # parenthetically for those who want it, but the headline is "what's
         # actually wrong" in human terms.
-        min_price = _extract_min_price_inr(idea.aov_estimate, idea.hero_product)
+        min_price = _extract_min_price_inr(idea.aov_estimate)
         if min_price is not None and min_price < min_aov_rupees:
             reasons.append(
                 f"Price point too low (₹{min_price}) — below ₹{min_aov_rupees} D2C economics floor"
