@@ -35,22 +35,21 @@ REQUIREMENTS = SKILL_ROOT / "requirements.txt"
 # ---------------------------------------------------------------------------
 
 CATEGORIES = {
+    # Core consumer product categories — TDV portfolio-aligned
     "beauty": ("Beauty", "makeup, skincare, haircare, fragrance"),
     "personal_care": ("Personal Care", "bath/body, oral, hygiene, shaving, deodorant"),
     "food_cpg": ("Food & CPG", "snacks, beverages, condiments (non-functional)"),
-    "home": ("Home", "cleaning, laundry, kitchen tools, decor, candles"),
-    "pet": ("Pet", "food, accessories, grooming"),
-    "wellness": ("Wellness", "sleep, stress, recovery, topicals, ingestible wellness"),
+    "home": ("Home", "cleaning, laundry, kitchen tools, decor, candles, home fragrance"),
+    "pet": ("Pet", "food, accessories, grooming, supplements"),
+    "wellness": ("Wellness", "adaptogens, topicals, ingestible wellness, functional gummies"),
     "sexual_wellness": ("Sexual Wellness", "intimacy products, hormonal, performance (premium)"),
-    "innerwear_loungewear": ("Innerwear & Loungewear", "innerwear, loungewear, socks, tees"),
-    "fashion_apparel": ("Fashion & Apparel", "women's, men's, kids' fashion-forward"),
-    "footwear": ("Footwear", "sneakers, sandals, formal, athleisure"),
-    "jewellery_watches": ("Jewellery & Watches", "fashion jewellery, fine, smartwatches"),
-    "eyewear": ("Eyewear", "sunglasses, prescription frames"),
-    "accessories": ("Accessories", "bags, travel gear, small leather, tech accessories"),
-    "consumer_electronics": ("Consumer Electronics", "audio, wearables, smart home, tech gadgets"),
-    "baby_kids": ("Baby & Kids", "clothing, feeding, toys, care"),
-    "fitness_nutrition": ("Fitness & Nutrition", "gear, supplements, protein, functional foods, gummies"),
+    "fashion_apparel": ("Fashion & Apparel", "women's, men's, premium/functional apparel"),
+    "jewellery_watches": ("Jewellery & Watches", "fashion jewellery, fine, lab-grown, smartwatches"),
+    "fitness_nutrition": ("Fitness & Nutrition", "gear, supplements, protein, functional foods, pre/post-workout"),
+    # TDV-specific new categories
+    "cognitive_wellness": ("Cognitive Wellness", "nootropics, focus supplements, brain health, memory, lion's mane, bacopa"),
+    "spiritual_lifestyle": ("Spiritual Lifestyle", "premium incense, meditation tools, yoga props, upgraded puja accessories, ayurvedic self-care"),
+    "sleep_recovery": ("Sleep & Recovery", "sleep supplements, magnesium, glycine, recovery tools, sleep hygiene products"),
 }
 
 DISTRIBUTION_CHANNELS = {

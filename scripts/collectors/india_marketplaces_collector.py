@@ -44,15 +44,12 @@ INDIA_MARKETPLACES: dict[str, list[str]] = {
     "pet": ["supertails.com", "headsupfortails.com", "amazon.in"],
     "wellness": ["healthkart.com", "1mg.com", "amazon.in"],
     "sexual_wellness": ["mymuse.in", "bold.care", "amazon.in"],
-    "innerwear_loungewear": ["myntra.com", "amazon.in"],
     "fashion_apparel": ["myntra.com", "ajio.com", "nykaafashion.com"],
-    "footwear": ["myntra.com", "ajio.com", "amazon.in"],
     "jewellery_watches": ["tata-cliq.com", "myntra.com", "amazon.in"],
-    "eyewear": ["lenskart.com", "amazon.in"],
-    "accessories": ["myntra.com", "amazon.in"],
-    "consumer_electronics": ["amazon.in", "flipkart.com", "croma.com"],
-    "baby_kids": ["firstcry.com", "hopscotch.com", "amazon.in"],
     "fitness_nutrition": ["healthkart.com", "decathlon.in", "amazon.in"],
+    "cognitive_wellness": ["healthkart.com", "1mg.com", "amazon.in"],
+    "spiritual_lifestyle": ["amazon.in", "flipkart.com", "puja.com"],
+    "sleep_recovery": ["healthkart.com", "1mg.com", "amazon.in"],
 }
 
 
@@ -67,8 +64,10 @@ QC_RELEVANT_CATEGORIES = {
     "pet",
     "wellness",
     "sexual_wellness",
-    "baby_kids",
     "fitness_nutrition",
+    "cognitive_wellness",
+    "sleep_recovery",
+    "spiritual_lifestyle",
 }
 
 
@@ -88,19 +87,16 @@ CATEGORY_KEYWORDS: dict[str, str] = {
     "beauty": "skincare OR haircare OR makeup",
     "personal_care": "deodorant OR shampoo OR body wash OR oral care",
     "food_cpg": "healthy snacks OR beverages OR condiments",
-    "home": "cleaning OR candles OR home decor",
-    "pet": "dog food OR cat litter OR pet care",
-    "wellness": "sleep gummies OR magnesium OR ashwagandha",
+    "home": "cleaning OR candles OR home fragrance OR decor",
+    "pet": "dog food OR cat litter OR pet supplements",
+    "wellness": "adaptogens OR ashwagandha OR functional gummies",
     "sexual_wellness": "intimacy products OR sexual wellness",
-    "innerwear_loungewear": "innerwear OR loungewear OR socks",
-    "fashion_apparel": "women fashion OR men fashion OR ethnic wear",
-    "footwear": "sneakers OR sandals OR formal shoes",
-    "jewellery_watches": "fashion jewellery OR smartwatch",
-    "eyewear": "sunglasses OR prescription glasses",
-    "accessories": "travel bag OR backpack OR laptop sleeve",
-    "consumer_electronics": "wireless earbuds OR bluetooth speaker OR smart home",
-    "baby_kids": "baby care OR kids toys OR feeding",
-    "fitness_nutrition": "whey protein OR resistance bands OR yoga mat",
+    "fashion_apparel": "women fashion OR men fashion OR premium apparel",
+    "jewellery_watches": "fashion jewellery OR lab grown diamond OR smartwatch",
+    "fitness_nutrition": "whey protein OR creatine OR pre-workout OR yoga mat",
+    "cognitive_wellness": "nootropics OR lion's mane OR focus supplements OR brain health",
+    "spiritual_lifestyle": "incense OR meditation cushion OR puja accessories OR yoga props",
+    "sleep_recovery": "sleep supplements OR magnesium glycinate OR melatonin OR recovery",
 }
 
 

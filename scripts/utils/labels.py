@@ -12,7 +12,7 @@ from __future__ import annotations
 
 
 HUMAN_LABELS: dict[str, str] = {
-    # Categories
+    # Categories — TDV Partners mandate
     "beauty": "Beauty",
     "personal_care": "Personal Care",
     "food_cpg": "Food & CPG",
@@ -20,15 +20,12 @@ HUMAN_LABELS: dict[str, str] = {
     "pet": "Pet",
     "wellness": "Wellness",
     "sexual_wellness": "Sexual Wellness",
-    "innerwear_loungewear": "Innerwear & Loungewear",
     "fashion_apparel": "Fashion & Apparel",
-    "footwear": "Footwear",
     "jewellery_watches": "Jewellery & Watches",
-    "eyewear": "Eyewear",
-    "accessories": "Accessories",
-    "consumer_electronics": "Consumer Electronics",
-    "baby_kids": "Baby & Kids",
     "fitness_nutrition": "Fitness & Nutrition",
+    "cognitive_wellness": "Cognitive Wellness",
+    "spiritual_lifestyle": "Spiritual Lifestyle",
+    "sleep_recovery": "Sleep & Recovery",
 
     # Hard excludes
     "cold_chain": "cold chain / perishables",
