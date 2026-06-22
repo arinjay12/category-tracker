@@ -38,55 +38,43 @@ CATEGORY_QUERIES: dict[str, list[str]] = {
         'site:reddit.com OR site:amazon.com',
     ],
     "home": [
-        '"1 star review" cleaning OR laundry OR kitchen tools OR candles complaints '
+        '"1 star review" cleaning OR laundry OR kitchen tools OR candles OR home fragrance complaints '
         'site:reddit.com OR site:amazon.com',
     ],
     "pet": [
-        '"1 star review" dog food OR cat litter OR pet grooming complaints '
+        '"1 star review" dog food OR cat litter OR pet grooming OR pet supplements complaints '
         'site:reddit.com OR site:amazon.com',
     ],
     "wellness": [
-        '"1 star review" sleep gummies OR magnesium OR ashwagandha OR massage gun complaints '
+        '"1 star review" adaptogens OR ashwagandha OR functional gummies OR wellness supplement complaints '
         'site:reddit.com OR site:amazon.com',
     ],
     "sexual_wellness": [
         '"1 star review" lube OR intimacy product OR libido supplement complaints '
         'site:reddit.com OR site:amazon.com',
     ],
-    "innerwear_loungewear": [
-        '"1 star review" innerwear OR loungewear OR socks OR basic tees complaints '
-        'site:reddit.com OR site:amazon.com',
-    ],
     "fashion_apparel": [
-        '"1 star review" dress OR shirt OR ethnic wear sizing OR fabric complaints '
-        'site:reddit.com OR site:amazon.com',
-    ],
-    "footwear": [
-        '"1 star review" sneakers OR sandals OR formal shoes complaints '
+        '"1 star review" dress OR shirt OR premium apparel sizing OR fabric complaints '
         'site:reddit.com OR site:amazon.com',
     ],
     "jewellery_watches": [
-        '"1 star review" fashion jewellery OR smartwatch complaints tarnish OR battery '
-        'site:reddit.com OR site:amazon.com',
-    ],
-    "eyewear": [
-        '"1 star review" sunglasses OR prescription glasses complaints '
-        'site:reddit.com OR site:amazon.com',
-    ],
-    "accessories": [
-        '"1 star review" travel bag OR laptop sleeve OR tech accessories complaints '
-        'site:reddit.com OR site:amazon.com',
-    ],
-    "consumer_electronics": [
-        '"1 star review" wireless earbuds OR bluetooth speaker OR smart home complaints '
-        'site:reddit.com OR site:amazon.com',
-    ],
-    "baby_kids": [
-        '"1 star review" baby care OR kids toys OR kids snacks complaints '
+        '"1 star review" fashion jewellery OR lab grown diamond OR smartwatch complaints tarnish OR battery '
         'site:reddit.com OR site:amazon.com',
     ],
     "fitness_nutrition": [
-        '"1 star review" resistance bands OR yoga mat OR whey protein OR creatine complaints '
+        '"1 star review" resistance bands OR yoga mat OR whey protein OR creatine OR pre-workout complaints '
+        'site:reddit.com OR site:amazon.com',
+    ],
+    "cognitive_wellness": [
+        '"1 star review" nootropics OR lion\'s mane OR focus supplement OR brain health complaints '
+        'site:reddit.com OR site:amazon.com',
+    ],
+    "spiritual_lifestyle": [
+        '"1 star review" incense OR meditation cushion OR yoga props OR puja accessories complaints '
+        'site:reddit.com OR site:amazon.com',
+    ],
+    "sleep_recovery": [
+        '"1 star review" magnesium glycinate OR sleep supplement OR melatonin OR sleep hygiene complaints '
         'site:reddit.com OR site:amazon.com',
     ],
 }
@@ -120,7 +108,7 @@ class AmazonUSCollector(BaseCollector):
             # collector still does something useful for an unconfigured skill.
             picked = all_categories
             logger.warning(
-                "[amazon_us] profile has no picked categories, falling back to all 16"
+                "[amazon_us] profile has no picked categories, falling back to all"
             )
 
         # Rotate: pick 3-4 categories per run. If user picked few categories,
