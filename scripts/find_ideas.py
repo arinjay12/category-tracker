@@ -35,7 +35,7 @@ import yaml
 from dotenv import load_dotenv
 
 # Load .env from user_data/ (the only place setup.py writes it)
-load_dotenv(USER_DATA / ".env", override=True)
+load_dotenv(USER_DATA / ".env", override=False)
 
 
 # ---------------------------------------------------------------------------

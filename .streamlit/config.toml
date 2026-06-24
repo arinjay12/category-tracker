@@ -1,0 +1,12 @@
+[server]
+# Allow long-running pipeline (up to 20 minutes)
+maxUploadSize = 10
+
+[browser]
+gatherUsageStats = false
+
+[theme]
+primaryColor = "#1f4e79"
+backgroundColor = "#ffffff"
+secondaryBackgroundColor = "#f0f2f6"
+textColor = "#0e1117"
