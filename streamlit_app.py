@@ -35,6 +35,7 @@ CATEGORIES: dict[str, tuple[str, str]] = {
     "cognitive_wellness": ("Cognitive Wellness", "nootropics, focus supplements, brain health, lion's mane, bacopa"),
     "spiritual_lifestyle":("Spiritual Lifestyle","premium incense, meditation tools, yoga props, puja accessories"),
     "sleep_recovery":     ("Sleep & Recovery",   "sleep supplements, magnesium, glycine, recovery tools"),
+    "consumer_tech":      ("Consumer Tech",       "earbuds, TWS, wearables, fitness trackers, smart home, portable audio"),
 }
 
 DISTRIBUTION_CHANNELS = [

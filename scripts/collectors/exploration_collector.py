@@ -144,6 +144,14 @@ CATEGORY_SEED_QUERIES: dict[str, list[str]] = {
         "site:reddit.com India insomnia sleep quality supplement discussion",
         "Indian sleep stack brand format shift sachet bedtime ritual",
     ],
+    "consumer_tech": [
+        "site:reddit.com/r/IndianTech earbuds TWS brand quality complaints",
+        "site:reddit.com India wireless earbuds fitness tracker brand recommendations",
+        "Indian consumer audio brand gap premium D2C earbuds 2026",
+        "Indian wearable fitness tracker brand gap boAt Noise competitor",
+        "site:reddit.com India smart home device brand complaints quality",
+        "Indian consumer hardware D2C brand format shift premium opportunity",
+    ],
 }
 
 # Cap total queries per run to keep Exa cost predictable. With 2 queries per

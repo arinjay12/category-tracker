@@ -26,6 +26,7 @@ HUMAN_LABELS: dict[str, str] = {
     "cognitive_wellness": "Cognitive Wellness",
     "spiritual_lifestyle": "Spiritual Lifestyle",
     "sleep_recovery": "Sleep & Recovery",
+    "consumer_tech": "Consumer Tech",
 
     # Hard excludes
     "cold_chain": "cold chain / perishables",

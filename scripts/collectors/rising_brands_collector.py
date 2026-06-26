@@ -134,6 +134,14 @@ CATEGORY_QUERY_POOLS: dict[str, list[tuple[str, str, str]]] = {
         ("new sleep stack D2C brand launch magnesium", "site:modernretail.co", "Modern Retail"),
         ("trending sleep recovery supplement brand 2026", "site:thefascination.com", "The Fascination"),
     ],
+    "consumer_tech": [
+        ("new consumer earbuds wearable hardware brand launch 2026", "site:modernretail.co", "Modern Retail"),
+        ("emerging audio wearable brand venture funding", "site:retailbrew.com", "Retail Brew"),
+        ("rising TWS earbuds fitness tracker category US trending", "site:explodingtopics.com", "Exploding Topics"),
+        ("indie consumer hardware brand to watch smart home 2026", "site:retailbrew.com", "Retail Brew"),
+        ("new D2C audio portable speaker brand launch", "site:modernretail.co", "Modern Retail"),
+        ("trending consumer wearable hardware brand 2026 funded", "site:thefascination.com", "The Fascination"),
+    ],
 }
 
 # How many queries to actually fire per run.

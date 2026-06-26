@@ -50,6 +50,7 @@ INDIA_MARKETPLACES: dict[str, list[str]] = {
     "cognitive_wellness": ["healthkart.com", "1mg.com", "amazon.in"],
     "spiritual_lifestyle": ["amazon.in", "flipkart.com", "puja.com"],
     "sleep_recovery": ["healthkart.com", "1mg.com", "amazon.in"],
+    "consumer_tech": ["amazon.in", "flipkart.com", "croma.com"],
 }
 
 
@@ -97,6 +98,7 @@ CATEGORY_KEYWORDS: dict[str, str] = {
     "cognitive_wellness": "nootropics OR lion's mane OR focus supplements OR brain health",
     "spiritual_lifestyle": "incense OR meditation cushion OR puja accessories OR yoga props",
     "sleep_recovery": "sleep supplements OR magnesium glycinate OR melatonin OR recovery",
+    "consumer_tech": "earbuds OR TWS OR fitness tracker OR smart speaker OR wearable",
 }
 
 

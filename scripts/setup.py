@@ -50,6 +50,7 @@ CATEGORIES = {
     "cognitive_wellness": ("Cognitive Wellness", "nootropics, focus supplements, brain health, memory, lion's mane, bacopa"),
     "spiritual_lifestyle": ("Spiritual Lifestyle", "premium incense, meditation tools, yoga props, upgraded puja accessories, ayurvedic self-care"),
     "sleep_recovery": ("Sleep & Recovery", "sleep supplements, magnesium, glycine, recovery tools, sleep hygiene products"),
+    "consumer_tech": ("Consumer Tech", "earbuds, TWS, wearables, fitness trackers, smart home, portable audio — physical hardware only"),
 }
 
 DISTRIBUTION_CHANNELS = {

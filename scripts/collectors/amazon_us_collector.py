@@ -77,6 +77,10 @@ CATEGORY_QUERIES: dict[str, list[str]] = {
         '"1 star review" magnesium glycinate OR sleep supplement OR melatonin OR sleep hygiene complaints '
         'site:reddit.com OR site:amazon.com',
     ],
+    "consumer_tech": [
+        '"1 star review" earbuds OR TWS OR fitness tracker OR smart home OR wireless speaker complaints '
+        'site:reddit.com OR site:amazon.com',
+    ],
 }
 
 
