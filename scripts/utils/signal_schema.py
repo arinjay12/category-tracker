@@ -132,9 +132,13 @@ class IdeaDict:
 
     # VC-specific fields added in TDV reframe v2
     exit_comps: str = ""        # global exit that proves category fundability
-    repeat_purchase: str = ""   # "repeat | one-time | occasion" + repurchase interval
+    repeat_purchase: str = ""   # products: repurchase interval | apps: DAU/WAU/MAU + retention note
     india_timing: str = ""      # "early | on-time | late" + one-line evidence
     portfolio_flag: str = ""    # TDV portfolio adjacency or conflict, set post-evaluation
+
+    # App-pipeline-specific fields (empty for physical product runs)
+    monetization_model: str = ""  # freemium | subscription | transaction | ads + ₹ price point
+    growth_loop: str = ""         # natural acquisition loop: what makes a user invite another?
 
     def to_dict(self) -> dict:
         return asdict(self)
